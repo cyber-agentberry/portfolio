@@ -1,0 +1,1560 @@
+/* ========================================
+   BASIC RESET & GLOBALS
+======================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  color: #333333;
+
+  /* Solid background color from your palette (#5E3AA2) */
+  background-color: #5E3AA2; 
+  /* Prevent horizontal scroll if flares move off screen (optional) */
+  overflow: hidden;
+}
+
+/* ========================================
+   PRELOADER
+======================================== */
+.preloader {
+  position: fixed;
+  top: 0; 
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.7s ease;
+}
+
+.loading-container {
+  text-align: center;
+}
+
+.loader-name {
+  font-size: 2.5rem;
+  color: #5E3AA2;
+  margin-bottom: 1rem;
+}
+
+.loader-line {
+  width: 0%;
+  height: 5px;
+  background-color: #8358d3;
+  animation: loadLine 2s linear forwards; 
+}
+
+@keyframes loadLine {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+/* Hide preloader on fade-out */
+.preloader.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ========================================
+   FLARES BACKGROUND
+======================================== */
+.flare-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; /* behind content, but over body background color */
+  overflow: hidden;
+
+  /* Ensures flares don't block clicks */
+  pointer-events: none;
+}
+
+.flare {
+  pointer-events: none;
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  filter: blur(50px);
+  animation: floatFlare 10s ease-in-out infinite alternate;
+}
+
+/* Simple floating animation */
+@keyframes floatFlare {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(100px, 200px); }
+}
+
+.flare-1 {
+  top: 10%;
+  left: 5%;
+  /* Teal radial gradient fading out */
+  background: radial-gradient(circle, rgba(0,182,184,0.4) 0%, rgba(0,182,184,0) 80%);
+  animation-duration: 12s; 
+}
+
+.flare-2 {
+  top: 60%;
+  left: 80%;
+  /* White radial gradient fading out */
+  background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 80%);
+  animation-duration: 15s;
+}
+
+.flare-3 {
+  top: 30%;
+  left: 40%;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 80%);
+  animation-duration: 20s;
+  filter: blur(80px);
+}
+.flare-4 {
+  top: 30%;
+  left: 40%;
+  background: radial-gradient(circle, rgba(0, 140, 255, 0.2) 0%, rgba(243, 103, 103, 0) 80%);
+  animation-duration: 40s;
+  filter: blur(80px);
+}
+.flare-5 {
+  top: 30%;
+  left: 40%;
+  background: radial-gradient(circle, rgba(96, 60, 255, 0.2) 0%, rgba(255,255,255,0) 80%);
+  animation-duration: 25s;
+  filter: blur(80px);
+}
+
+/* ========================================
+   NAVBAR
+======================================== */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;           
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #ffffff;
+  padding: 20px 50px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  z-index: 1000; 
+}
+
+.logo-image {
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+}
+
+.nav-right .nav-links {
+  list-style: none;
+  display: flex;
+  gap: 50px;
+  margin: 0;
+  padding: 0;
+}
+
+/* Base link style */
+.nav-right .nav-links li a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+/* Hover effect for the entire link (both icon and text) */
+.nav-right .nav-links li a:hover {
+  color: #5E3AA2; /* Purple text on hover */
+  transform: scale(1.05); /* Slight zoom for the entire link block */
+}
+
+/* You can also specifically target the icon on hover if you like */
+.nav-right .nav-links li a:hover .nav-icon {
+  filter: brightness(1.2); /* Lighten the icon */
+}
+
+.nav-icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 4px;
+}
+
+.nav-text {
+  font-size: 0.85rem;
+}
+
+/* ========================================
+   SECTION BASE
+======================================== */
+.section {
+  position: absolute;
+  top: 80px; /* below navbar */
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 80px);
+  padding: 3rem 2rem;
+  
+  /* Transparent to show purple + flares behind it */
+  background-color: transparent;
+
+  z-index: 2;  /* above the flares */
+
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.section.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ========================================
+   HOME SECTION
+======================================== */
+.home-section {
+  /* Use flex to center content both horizontally and vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Container for everything in home */
+.hero-content {
+  /* Display flex to have image & text side by side */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;     /* space between image and text */
+  max-width: 900px;
+  margin: 0 auto;
+  color: #ffffff; /* white text if you want to keep the purple background behind */
+}
+
+/* Profile image styling */
+.profile-image {
+  display: block;
+  max-width: 300px;
+  height: auto;
+  border-radius: 8px;
+  /* border-radius: 50%;  <-- remove or comment out for rectangular shape */
+  border: 2px solid #fff; /* optional white border */
+  margin: 0 auto; 
+}
+
+/* Headings & subtitles in hero */
+.hero-text h2 {
+  font-size: 2rem;
+  color: #ffffff; 
+  margin-bottom: 0.5rem;
+}
+
+.hero-text h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.hero-text h1 span {
+  color: #00B6B8; /* teal accent */
+}
+
+.subtitle {
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+/* ========================================
+   PROJECTS, ABOUT, RESUME, CONTACT
+======================================== */
+.projects-section{
+  overflow-y: auto;
+  text-align: center;
+  background-color: transparent;
+  color: #fff; /* or #333, depending on preference */
+}
+
+.projects-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center each project horizontally */
+  gap: 3rem; 
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.project-item {
+  width: 100%;
+  max-width: 800px; 
+  margin: 0 auto;
+}
+
+.project-item h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #00B6B8; /* Or #fff, #5E3AA2, etc. based on your palette */
+}
+
+.project-item p {
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  color: #ffffff; /* Or #fff if you prefer white text over a dark bg */
+}
+
+.certificate-container {
+  margin-top: 1.5rem;
+  text-align: center; /* center the image horizontally */
+}
+
+/* The certificate image itself */
+.certificate-img {
+  height: auto;
+  border: 2px solid #ddd; /* optional border or box-shadow if you like */
+  border-radius: 4px;  
+  width: 100%;
+}
+.about-section,
+.contact-section {
+  background-color: transparent;
+  color: #fff; /* or #333, depending on preference */
+}
+
+.projects-section h2,
+.about-section h2,
+.resume-section h2,
+.contact-section h2 {
+  font-size: 2rem;
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.project-card {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: box-shadow 0.3s ease;
+  background-color: #fff; /* ensuring text is visible on the card */
+  color: #333;
+}
+
+.project-card:hover {
+  box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+}
+
+.project-card h3 {
+  color: #5E3AA2;
+  margin-bottom: 0.5rem;
+}
+
+.social-media {
+  margin: 1rem 0;
+  display: flex;
+  gap: 1rem;
+}
+
+/* ABOUT SECTION BASE */
+.about-section {
+  /* If your site uses the .section styling with position absolute,
+     keep consistent with that. Otherwise, this is fine. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Outer container: horizontal layout for text (left) and image (right) */
+.about-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  gap: 2rem; /* space between text and image */
+}
+
+/* LEFT SIDE */
+.about-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* The main heading: "Hello, I am Khushboo" */
+.about-title {
+  font-size: 2.5rem; /* large heading */
+  margin-bottom: 1rem;
+  color: #fff;       /* keep it white */
+  line-height: 1.2;
+}
+
+/* Pink highlight for the name */
+.highlighted-name {
+  color: #EB3C7D; /* or your pink/magenta accent color */
+}
+
+/* Sparkle styling if desired */
+.sparkle {
+  margin-left: 0.25rem;
+}
+
+/* Paragraph text styling */
+.about-paragraph {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  color: rgba(255, 255, 255, 0.85); /* a softer white for paragraphs */
+}
+
+/* Subheading (italic line "Minimalism is my Mantra...") */
+.about-subhead {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: #fff;
+  font-weight: 400; /* not too bold, if you want an airy feel */
+}
+
+/* RIGHT SIDE: Image */
+.about-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* The portrait image style */
+.about-image {
+  max-width: 100%;
+  border-radius: 8px; /* slightly rounded corners, or remove */
+  border: 2px solid #fff; /* optional white border */
+  margin: 0 auto; 
+  object-fit: cover;
+  height: 600px; 
+  width: auto; 
+  
+}
+
+/* MEDIA QUERY for smaller screens */
+@media (max-width: 992px) {
+  .about-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  .about-right {
+    margin-top: 2rem;
+  }
+}
+
+/* ========================================
+   CONTACT SECTION
+======================================== */
+/* Feel free to customize the exact layout to match your screenshot more closely */
+.contact-section {
+  /* it already has background-color: transparent; 
+     color: #fff; 
+     from the .projects-section,... rule above
+  */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Container that holds left (text, heading, icons) and right (form) */
+.contact-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  gap: 3rem; /* spacing between left & right blocks */
+}
+
+/* Left side: heading, description, social icons, etc. */
+.contact-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.contact-left h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #ffffff; /* stands out on purple background */
+}
+
+.contact-subtitle {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+  max-width: 450px; /* limit the text width if desired */
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.network-text {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+/* Row of icons for social links (LinkedIn, Behance, Dribbble, etc.) */
+.social-icons-row {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem; /* space between icons */
+}
+
+.icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+}
+
+.icon-link:hover {
+  opacity: 0.8;
+}
+
+.social-icon {
+  width: 30px;
+  height: 30px;
+}
+
+/* Right side: form area */
+.contact-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* vertical spacing between fields */
+  width: 100%;
+  max-width: 400px; /* form width */
+}
+
+/* Form fields (name, email) */
+.form-field,
+.form-textarea {
+  background-color: rgba(255, 255, 255, 0.06); 
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  outline: none;
+  font-size: 1rem;
+}
+
+.form-textarea {
+  min-height: 120px;
+  resize: none; /* optional: disable manual resize */
+}
+
+/* "SEND" button */
+.send-btn {
+  background-color: #ffffff; 
+  color: #000000;
+  border: 1px solid #ffffff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.send-btn:hover {
+  background-color: #e2e2e2;
+}
+
+/* Make contact section responsive */
+@media (max-width: 992px) {
+  .contact-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2rem;
+  }
+  .contact-left, 
+  .contact-right {
+    width: 100%;
+    flex: unset;
+  }
+  .contact-left {
+    margin-bottom: 2rem;
+  }
+}
+
+/* ========================================
+   FOOTER
+======================================== */
+.footer-section {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  
+  height: 60px; 
+  background-color: #ffffff;
+  color: #333;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+  z-index: 1000;
+
+  /* Flex container for single-line alignment */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* or space-between */
+  padding: 0 1rem;
+}
+
+.footer-text {
+  margin: 0;  
+  font-size: 0.9rem;
+}
+
+/* Container for the social icons in footer */
+.footer-social {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: 1rem; 
+}
+
+/* Each social link in the footer */
+.footer-social-link {
+  display: inline-block;
+  transition: opacity 0.3s ease;
+}
+
+.footer-social-link:hover {
+  opacity: 0.7;
+}
+
+/* Icon styling in the footer */
+.footer-social-icon {
+  width: 24px;  
+  height: 24px; 
+}
+
+/* ========================================
+   FADE-IN-UP ANIMATION
+======================================== */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 1s ease forwards;
+}
+
+/* ========================================
+   RESPONSIVE QUERIES
+======================================== */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 10px 20px;
+  }
+  .logo-image {
+    width: 80px;
+  }
+  .nav-right .nav-links {
+    gap: 10px;
+  }
+  .nav-icon {
+    width: 20px;
+    height: 20px;
+  }
+  .nav-text {
+    font-size: 0.8rem;
+  }
+
+  /* Make hero-content stack on smaller screens */
+  .hero-content {
+    flex-direction: column;
+    max-width: 90%;
+  }
+  .profile-image {
+    max-width: 80%;
+  }
+}
+
+/* ========================================
+   ANIMATION KEYFRAMES
+======================================== */
+/* 1) Zoom In Animation */
+@keyframes zoomIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 2) Slide In From Left Animation */
+@keyframes slideInLeft {
+  0% {
+    transform: translateX(-40px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ========================================
+   ANIMATION CLASSES
+======================================== */
+/* Hero image: zoom-in */
+.zoom-in {
+  opacity: 0;
+  animation: zoomIn 1.2s ease forwards;
+  /* Delay so it happens after preloader is gone. Adjust as needed. */
+  animation-delay: 3s;
+}
+
+/* Hero text: slide-in-left */
+.slide-in-left {
+  opacity: 0;
+  animation: slideInLeft 1s ease forwards;
+  /* Delay as well */
+  animation-delay: 3s;
+}
+
+/* ========================================
+   BUTTON STYLING
+======================================== */
+.know-more-btn {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #ffffff; 
+  color: #000000;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.know-more-btn:hover {
+  background-color: #e2e2e2;
+}
+/* ========================================
+   BASIC RESET & GLOBALS
+======================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  color: #333333;
+
+  /* Solid background color from your palette (#5E3AA2) */
+  background-color: #5E3AA2; 
+  /* Prevent horizontal scroll if flares move off screen (optional) */
+  overflow: hidden;
+}
+
+/* ========================================
+   PRELOADER
+======================================== */
+.preloader {
+  position: fixed;
+  top: 0; 
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.7s ease;
+}
+
+.loading-container {
+  text-align: center;
+}
+
+.loader-name {
+  font-size: 2.5rem;
+  color: #5E3AA2;
+  margin-bottom: 1rem;
+}
+
+.loader-line {
+  width: 0%;
+  height: 5px;
+  background-color: #8358d3;
+  animation: loadLine 2s linear forwards; 
+}
+
+@keyframes loadLine {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+/* Hide preloader on fade-out */
+.preloader.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ========================================
+   FLARES BACKGROUND
+======================================== */
+.flare-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; /* behind content, but over body background color */
+  overflow: hidden;
+
+  /* Ensures flares don't block clicks */
+  pointer-events: none;
+}
+
+.flare {
+  pointer-events: none;
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  filter: blur(50px);
+  animation: floatFlare 10s ease-in-out infinite alternate;
+}
+
+/* Simple floating animation */
+@keyframes floatFlare {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(100px, 200px); }
+}
+
+.flare-1 {
+  top: 10%;
+  left: 5%;
+  /* Teal radial gradient fading out */
+  background: radial-gradient(circle, rgba(0,182,184,0.4) 0%, rgba(0,182,184,0) 80%);
+  animation-duration: 12s; 
+}
+
+.flare-2 {
+  top: 60%;
+  left: 80%;
+  /* White radial gradient fading out */
+  background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 80%);
+  animation-duration: 15s;
+}
+
+.flare-3 {
+  top: 30%;
+  left: 40%;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 80%);
+  animation-duration: 20s;
+  filter: blur(80px);
+}
+.flare-4 {
+  top: 30%;
+  left: 40%;
+  background: radial-gradient(circle, rgba(0, 140, 255, 0.2) 0%, rgba(243, 103, 103, 0) 80%);
+  animation-duration: 40s;
+  filter: blur(80px);
+}
+.flare-5 {
+  top: 30%;
+  left: 40%;
+  background: radial-gradient(circle, rgba(96, 60, 255, 0.2) 0%, rgba(255,255,255,0) 80%);
+  animation-duration: 25s;
+  filter: blur(80px);
+}
+
+/* ========================================
+   NAVBAR
+======================================== */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;           
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #ffffff;
+  padding: 20px 50px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  z-index: 1000; 
+}
+
+.logo-image {
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+}
+
+.nav-right .nav-links {
+  list-style: none;
+  display: flex;
+  gap: 50px;
+  margin: 0;
+  padding: 0;
+}
+
+/* Base link style */
+.nav-right .nav-links li a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+/* Hover effect for the entire link (both icon and text) */
+.nav-right .nav-links li a:hover {
+  color: #5E3AA2; /* Purple text on hover */
+  transform: scale(1.05); /* Slight zoom for the entire link block */
+}
+
+/* You can also specifically target the icon on hover if you like */
+.nav-right .nav-links li a:hover .nav-icon {
+  filter: brightness(1.2); /* Lighten the icon */
+}
+
+.nav-icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 4px;
+}
+
+.nav-text {
+  font-size: 0.85rem;
+}
+
+/* ========================================
+   SECTION BASE
+======================================== */
+.section {
+  position: absolute;
+  top: 80px; /* below navbar */
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 80px);
+  padding: 3rem 2rem;
+  
+  /* Transparent to show purple + flares behind it */
+  background-color: transparent;
+
+  z-index: 2;  /* above the flares */
+
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.section.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ========================================
+   HOME SECTION
+======================================== */
+.home-section {
+  /* Use flex to center content both horizontally and vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Container for everything in home */
+.hero-content {
+  /* Display flex to have image & text side by side */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;     /* space between image and text */
+  max-width: 900px;
+  margin: 0 auto;
+  color: #ffffff; /* white text if you want to keep the purple background behind */
+}
+
+/* Profile image styling */
+.profile-image {
+  display: block;
+  max-width: 300px;
+  height: auto;
+  border-radius: 8px;
+  /* border-radius: 50%;  <-- remove or comment out for rectangular shape */
+  border: 2px solid #fff; /* optional white border */
+  margin: 0 auto; 
+}
+
+/* Headings & subtitles in hero */
+.hero-text h2 {
+  font-size: 2rem;
+  color: #ffffff; 
+  margin-bottom: 0.5rem;
+}
+
+.hero-text h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.hero-text h1 span {
+  color: #00B6B8; /* teal accent */
+}
+
+.subtitle {
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+/* ========================================
+   PROJECTS, ABOUT, RESUME, CONTACT
+======================================== */
+.projects-section{
+  overflow-y: auto;
+  text-align: center;
+  background-color: transparent;
+  color: #fff; /* or #333, depending on preference */
+}
+
+.projects-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center each project horizontally */
+  gap: 3rem; 
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.project-item {
+  width: 100%;
+  max-width: 800px; 
+  margin: 0 auto;
+}
+
+.project-item h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #00B6B8; /* Or #fff, #5E3AA2, etc. based on your palette */
+}
+
+.project-item p {
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  color: #ffffff; /* Or #fff if you prefer white text over a dark bg */
+}
+
+.certificate-container {
+  margin-top: 1.5rem;
+  text-align: center; /* center the image horizontally */
+}
+
+/* The certificate image itself */
+.certificate-img {
+  height: auto;
+  border: 2px solid #ddd; /* optional border or box-shadow if you like */
+  border-radius: 4px;  
+  width: 100%;
+}
+.about-section,
+.contact-section {
+  background-color: transparent;
+  color: #fff; /* or #333, depending on preference */
+}
+
+.projects-section h2,
+.about-section h2,
+.resume-section h2,
+.contact-section h2 {
+  font-size: 2rem;
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.project-card {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: box-shadow 0.3s ease;
+  background-color: #fff; /* ensuring text is visible on the card */
+  color: #333;
+}
+
+.project-card:hover {
+  box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+}
+
+.project-card h3 {
+  color: #5E3AA2;
+  margin-bottom: 0.5rem;
+}
+
+.social-media {
+  margin: 1rem 0;
+  display: flex;
+  gap: 1rem;
+}
+
+/* ABOUT SECTION BASE */
+.about-section {
+  /* If your site uses the .section styling with position absolute,
+     keep consistent with that. Otherwise, this is fine. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Outer container: horizontal layout for text (left) and image (right) */
+.about-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  gap: 2rem; /* space between text and image */
+}
+
+/* LEFT SIDE */
+.about-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* The main heading: "Hello, I am Khushboo" */
+.about-title {
+  font-size: 2.5rem; /* large heading */
+  margin-bottom: 1rem;
+  color: #fff;       /* keep it white */
+  line-height: 1.2;
+}
+
+/* Pink highlight for the name */
+.highlighted-name {
+  color: #EB3C7D; /* or your pink/magenta accent color */
+}
+
+/* Sparkle styling if desired */
+.sparkle {
+  margin-left: 0.25rem;
+}
+
+/* Paragraph text styling */
+.about-paragraph {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  color: rgba(255, 255, 255, 0.85); /* a softer white for paragraphs */
+}
+
+/* Subheading (italic line "Minimalism is my Mantra...") */
+.about-subhead {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: #fff;
+  font-weight: 400; /* not too bold, if you want an airy feel */
+}
+
+/* RIGHT SIDE: Image */
+.about-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* The portrait image style */
+.about-image {
+  max-width: 100%;
+  border-radius: 8px; /* slightly rounded corners, or remove */
+  border: 2px solid #fff; /* optional white border */
+  margin: 0 auto; 
+  object-fit: cover;
+  height: 600px; 
+  width: auto; 
+  
+}
+
+/* MEDIA QUERY for smaller screens */
+@media (max-width: 992px) {
+  .about-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  .about-right {
+    margin-top: 2rem;
+  }
+}
+
+/* ========================================
+   CONTACT SECTION
+======================================== */
+/* Feel free to customize the exact layout to match your screenshot more closely */
+.contact-section {
+  /* it already has background-color: transparent; 
+     color: #fff; 
+     from the .projects-section,... rule above
+  */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Container that holds left (text, heading, icons) and right (form) */
+.contact-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  gap: 3rem; /* spacing between left & right blocks */
+}
+
+/* Left side: heading, description, social icons, etc. */
+.contact-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.contact-left h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #ffffff; /* stands out on purple background */
+}
+
+.contact-subtitle {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+  max-width: 450px; /* limit the text width if desired */
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.network-text {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+/* Row of icons for social links (LinkedIn, Behance, Dribbble, etc.) */
+.social-icons-row {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem; /* space between icons */
+}
+
+.icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+}
+
+.icon-link:hover {
+  opacity: 0.8;
+}
+
+.social-icon {
+  width: 30px;
+  height: 30px;
+}
+
+/* Right side: form area */
+.contact-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* vertical spacing between fields */
+  width: 100%;
+  max-width: 400px; /* form width */
+}
+
+/* Form fields (name, email) */
+.form-field,
+.form-textarea {
+  background-color: rgba(255, 255, 255, 0.06); 
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  outline: none;
+  font-size: 1rem;
+}
+
+.form-textarea {
+  min-height: 120px;
+  resize: none; /* optional: disable manual resize */
+}
+
+/* "SEND" button */
+.send-btn {
+  background-color: #ffffff; 
+  color: #000000;
+  border: 1px solid #ffffff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.send-btn:hover {
+  background-color: #e2e2e2;
+}
+
+/* Make contact section responsive */
+@media (max-width: 992px) {
+  .contact-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2rem;
+  }
+  .contact-left, 
+  .contact-right {
+    width: 100%;
+    flex: unset;
+  }
+  .contact-left {
+    margin-bottom: 2rem;
+  }
+}
+
+/* ========================================
+   FOOTER
+======================================== */
+.footer-section {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  
+  height: 60px; 
+  background-color: #ffffff;
+  color: #333;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+  z-index: 1000;
+
+  /* Flex container for single-line alignment */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* or space-between */
+  padding: 0 1rem;
+}
+
+.footer-text {
+  margin: 0;  
+  font-size: 0.9rem;
+}
+
+/* Container for the social icons in footer */
+.footer-social {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: 1rem; 
+}
+
+/* Each social link in the footer */
+.footer-social-link {
+  display: inline-block;
+  transition: opacity 0.3s ease;
+}
+
+.footer-social-link:hover {
+  opacity: 0.7;
+}
+
+/* Icon styling in the footer */
+.footer-social-icon {
+  width: 24px;  
+  height: 24px; 
+}
+
+/* ========================================
+   FADE-IN-UP ANIMATION
+======================================== */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 1s ease forwards;
+}
+
+/* ========================================
+   RESPONSIVE QUERIES
+======================================== */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 10px 20px;
+  }
+  .logo-image {
+    width: 80px;
+  }
+  .nav-right .nav-links {
+    gap: 10px;
+  }
+  .nav-icon {
+    width: 20px;
+    height: 20px;
+  }
+  .nav-text {
+    font-size: 0.8rem;
+  }
+
+  /* Make hero-content stack on smaller screens */
+  .hero-content {
+    flex-direction: column;
+    max-width: 90%;
+  }
+  .profile-image {
+    max-width: 80%;
+  }
+}
+
+/* ========================================
+   ANIMATION KEYFRAMES
+======================================== */
+/* 1) Zoom In Animation */
+@keyframes zoomIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 2) Slide In From Left Animation */
+@keyframes slideInLeft {
+  0% {
+    transform: translateX(-40px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ========================================
+   ANIMATION CLASSES
+======================================== */
+/* Hero image: zoom-in */
+.zoom-in {
+  opacity: 0;
+  animation: zoomIn 1.2s ease forwards;
+  /* Delay so it happens after preloader is gone. Adjust as needed. */
+  animation-delay: 3s;
+}
+
+/* Hero text: slide-in-left */
+.slide-in-left {
+  opacity: 0;
+  animation: slideInLeft 1s ease forwards;
+  /* Delay as well */
+  animation-delay: 3s;
+}
+
+/* ========================================
+   BUTTON STYLING
+======================================== */
+.know-more-btn {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #ffffff; 
+  color: #000000;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.know-more-btn:hover {
+  background-color: #e2e2e2;
+}
